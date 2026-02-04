@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from youtube_transcript_api import YouTubeTranscriptApi
-from youtube_transcript_api._errors import TranscriptsDisabled, NoTranscriptFound, VideoUnavailable
 import re
 import os
 
@@ -52,7 +51,7 @@ def is_valid_youtube_url(url):
 def get_subtitles(video_id, preferred_lang='en'):
     """Get subtitles using youtube-transcript-api"""
     try:
-        # Try to get transcript in preferred language
+        # Try to get transcript in preferred language using the new v1.2.4 API
         transcript_list = ytt_api.list(video_id)
         
         transcript = None
@@ -108,15 +107,6 @@ def get_subtitles(video_id, preferred_lang='en'):
             'languageName': LANGUAGE_NAMES.get(used_lang, used_lang)
         }
         
-    except TranscriptsDisabled:
-        print(f"Transcripts disabled for video {video_id}")
-        return None
-    except NoTranscriptFound:
-        print(f"No transcript found for video {video_id}")
-        return None
-    except VideoUnavailable:
-        print(f"Video unavailable: {video_id}")
-        return None
     except Exception as e:
         print(f"Error fetching transcript: {e}")
         return None
